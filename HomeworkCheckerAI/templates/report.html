@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Homework Report - {{ student_name }}</title>
+<style>
+  :root {
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --bg: #f9fafb;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --accent: {{ grade_color }};
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 32px;
+    line-height: 1.5;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+  header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header h1 { margin: 0 0 4px 0; font-size: 22px; }
+  header .meta { color: var(--muted); font-size: 13px; }
+  .score-badge {
+    background: var(--accent);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .score-badge .num { font-size: 28px; font-weight: 700; display: block; }
+  .score-badge .label { font-size: 12px; opacity: .9; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 18px;
+  }
+  .q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .q-header h2 { margin: 0; font-size: 17px; }
+  .q-score {
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: white;
+  }
+  .difficulty {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-left: 8px;
+  }
+  .field { margin: 10px 0; }
+  .field .k {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .field .v { font-size: 14.5px; white-space: pre-wrap; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .tag {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11.5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  ul.simple { margin: 4px 0 0 0; padding-left: 20px; }
+  ul.simple li { margin-bottom: 4px; font-size: 14.5px; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .summary-grid h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    margin: 0 0 8px 0;
+  }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 28px;
+  }
+  @media (max-width: 600px) {
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div>
+      <h1>Homework Grading Report</h1>
+      <div class="meta">Student: {{ student_name }} &nbsp;&middot;&nbsp; Generated {{ generated_at }}</div>
+    </div>
+    <div class="score-badge">
+      <span class="num">{{ overall_score }}</span>
+      <span class="label">{{ grade }}</span>
+    </div>
+  </header>
+
+  {% for q in questions %}
+  <div class="card">
+    <div class="q-header">
+      <h2>Question {{ q.question_number }}<span class="difficulty">{{ q.difficulty }}</span></h2>
+      <span class="q-score" style="background: {{ q.grade_color }};">{{ q.score }}/100 &middot; {{ q.grade_label }}</span>
+    </div>
+
+    <div class="field">
+      <div class="k">Question</div>
+      <div class="v">{{ q.question }}</div>
+    </div>
+    <div class="field">
+      <div class="k">Student Answer</div>
+      <div class="v">{{ q.student_answer }}</div>
+    </div>
+    <div class="field">
+      <div class="k">Expected Solution</div>
+      <div class="v">{{ q.expected_solution }}</div>
+    </div>
+    <div class="field">
+      <div class="k">Analysis</div>
+      <div class="v">{{ q.analysis }}</div>
+    </div>
+
+    {% if q.mistakes %}
+    <div class="field">
+      <div class="k">Mistakes</div>
+      <ul class="simple">
+        {% for m in q.mistakes %}<li>{{ m }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if q.error_categories %}
+    <div class="field">
+      <div class="k">Error Categories</div>
+      <div class="tags">
+        {% for c in q.error_categories %}<span class="tag">{{ c }}</span>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="field">
+      <div class="k">Correct Answer</div>
+      <div class="v">{{ q.correct_answer }}</div>
+    </div>
+
+    {% if q.suggestions %}
+    <div class="field">
+      <div class="k">Suggestions</div>
+      <ul class="simple">
+        {% for s in q.suggestions %}<li>{{ s }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="card">
+    <h2 style="margin-top:0;">Final Summary</h2>
+    <div class="summary-grid">
+      <div>
+        <h3>Strengths</h3>
+        <ul class="simple">
+          {% for s in summary.get('strengths', []) %}<li>{{ s }}</li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>Weaknesses</h3>
+        <ul class="simple">
+          {% for w in summary.get('weaknesses', []) %}<li>{{ w }}</li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>Topics to Review</h3>
+        <ul class="simple">
+          {% for t in summary.get('topics_to_review', []) %}<li>{{ t }}</li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>Study Recommendations</h3>
+        <ul class="simple">
+          {% for r in summary.get('recommendations', []) %}<li>{{ r }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>Generated by Homework Checker AI</footer>
+</div>
+</body>
+</html>
